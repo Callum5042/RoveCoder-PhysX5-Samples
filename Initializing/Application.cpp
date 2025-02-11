@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Camera.h"
+#include "Physics.h"
 
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -32,6 +33,10 @@ Application::Application()
 
 	// Create camera
 	m_Camera = std::make_unique<Camera>(window_width, window_height);
+
+	// Physics
+	m_Physics = std::make_unique<Physics>();
+	m_Physics->Setup();
 }
 
 int Application::Execute()
@@ -42,6 +47,20 @@ int Application::Execute()
 	// Model
 	m_Model = std::make_unique<Model>(m_Renderer.get());
 	m_Model->Create();
+
+	CreatePhysicsActor();
+
+	physx::PxShapeFlags shapeFlags = physx::PxShapeFlag::eVISUALIZATION | physx::PxShapeFlag::eSCENE_QUERY_SHAPE | physx::PxShapeFlag::eSIMULATION_SHAPE;
+	physx::PxMaterial* materialPtr = m_Physics->GetPhysics()->createMaterial(0.4f, 0.4f, 0.4f);
+
+	physx::PxRigidStatic* rigidStatic = m_Physics->GetPhysics()->createRigidStatic(physx::PxTransformFromPlaneEquation(physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 1.f)));
+	{
+		physx::PxShape* shape = m_Physics->GetPhysics()->createShape(physx::PxPlaneGeometry(), &materialPtr, 1, true, shapeFlags);
+		rigidStatic->attachShape(*shape);
+		shape->release(); // this way shape gets automatically released with actor
+	}
+
+	m_Physics->GetScene()->addActor(*rigidStatic);
 
 	// Main application loop
 	while (m_Running)
@@ -62,6 +81,8 @@ int Application::Execute()
 		}
 		else
 		{
+			m_Physics->Simulate(timer.DeltaTime());
+
 			// Clear the buffers
 			m_Renderer->Clear();
 
@@ -69,6 +90,9 @@ int Application::Execute()
 			m_Shader->Use();
 
 			// Render the model
+			auto t = m_Body->getGlobalPose();
+			m_Model->World = DirectX::XMMatrixTranslation(t.p.x, t.p.y, t.p.z);
+
 			this->UpdateWorldConstantBuffer(m_Model->World);
 			m_Model->Render();
 
@@ -170,4 +194,19 @@ void Application::UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world)
 	DirectX::XMFLOAT3 position = m_Camera->GetPosition();
 	DirectX::XMMATRIX inverse_model = DirectX::XMMatrixInverse(nullptr, world);
 	m_Shader->UpdateModelViewProjectionBuffer(matrix, inverse_model, position);
+}
+
+void Application::CreatePhysicsActor()
+{
+	physx::PxMaterial* material = m_Physics->GetPhysics()->createMaterial(0.4f, 0.4f, 0.4f);
+	physx::PxShape* shape = m_Physics->GetPhysics()->createShape(physx::PxBoxGeometry(1.0f, 1.0f, 1.0f), *material);
+
+	// Set position
+	physx::PxVec3 position = physx::PxVec3(physx::PxReal(0.0f), physx::PxReal(2.0f), physx::PxReal(0.0f));
+	physx::PxTransform transform(position);
+
+	m_Body = m_Physics->GetPhysics()->createRigidDynamic(transform);
+	m_Body->attachShape(*shape);
+	physx::PxRigidBodyExt::updateMassAndInertia(*m_Body, 100.0f);
+	m_Physics->GetScene()->addActor(*m_Body);
 }

@@ -7,6 +7,8 @@
 #include <memory>
 #include <string>
 
+#include "Physics.h"
+
 #include <DirectXMath.h>
 using namespace DirectX;
 
@@ -18,6 +20,7 @@ class Camera;
 class Model;
 class RasterState;
 class TextureSampler;
+class Physics;
 
 class Application
 {
@@ -38,6 +41,7 @@ private:
 	std::unique_ptr<Shader> m_Shader = nullptr;
 	std::unique_ptr<Model> m_Model = nullptr;
 	std::unique_ptr<Camera> m_Camera = nullptr;
+	std::unique_ptr<Physics> m_Physics = nullptr;
 
 	bool m_Running = true;
 	bool m_WindowCreated = false;
@@ -55,4 +59,10 @@ private:
 
 	// Compute model view projection of the camera
 	void UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world);
+
+	// Physics bullshit
+	physx::PxRigidBody* m_Body = nullptr;
+	void CreatePhysicsActor();
+
+	physx::PxRigidBody* m_Floor = nullptr;
 };
