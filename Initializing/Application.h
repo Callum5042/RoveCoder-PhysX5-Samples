@@ -7,6 +7,9 @@
 #include <memory>
 #include <string>
 
+#include <DirectXMath.h>
+using namespace DirectX;
+
 class Window;
 class Renderer;
 class Shader;
@@ -51,5 +54,5 @@ private:
 	int m_FrameCount = 0;
 
 	// Compute model view projection of the camera
-	void ComputeModelViewProjectionMatrix();
+	void UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world);
 };

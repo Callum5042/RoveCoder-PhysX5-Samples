@@ -1,6 +1,8 @@
 #pragma once
 
 #include <d3d11.h>
+#include <DirectXMath.h>
+using namespace DirectX;
 
 // This include is requires for using DirectX smart pointers (ComPtr)
 #include <wrl\client.h>
@@ -21,6 +23,9 @@ public:
 
 	// Render the model
 	void Render();
+
+	// Position
+	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
 private:
 	// Number of indices to draw

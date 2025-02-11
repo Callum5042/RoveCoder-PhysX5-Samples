@@ -68,10 +68,8 @@ int Application::Execute()
 			// Bind the shader to the pipeline
 			m_Shader->Use();
 
-			// Update the model view projection constant buffer
-			this->ComputeModelViewProjectionMatrix();
-
 			// Render the model
+			this->UpdateWorldConstantBuffer(m_Model->World);
 			m_Model->Render();
 
 			// Display the rendered scene
@@ -161,18 +159,15 @@ void Application::CalculateFrameStats(float delta_time)
 	}
 }
 
-void Application::ComputeModelViewProjectionMatrix()
+void Application::UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world)
 {
-	// Model matrix
-	DirectX::XMMATRIX model = DirectX::XMMatrixIdentity();
-
 	// View Projection
 	DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
-	matrix *= model;
+	matrix *= world;
 	matrix *= m_Camera->GetView();
 	matrix *= m_Camera->GetProjection();
 
 	DirectX::XMFLOAT3 position = m_Camera->GetPosition();
-	DirectX::XMMATRIX inverse_model = DirectX::XMMatrixInverse(nullptr, model);
+	DirectX::XMMATRIX inverse_model = DirectX::XMMatrixInverse(nullptr, world);
 	m_Shader->UpdateModelViewProjectionBuffer(matrix, inverse_model, position);
 }
