@@ -8,15 +8,15 @@ using namespace DirectX;
 #include <wrl\client.h>
 using Microsoft::WRL::ComPtr;
 
-class Renderer;
+class RenderDevice;
 
-class Model
+class Mesh
 {
-	Renderer* m_Renderer = nullptr;
+	RenderDevice* m_Renderer = nullptr;
 
 public:
-	Model(Renderer* renderer);
-	virtual ~Model() = default;
+	Mesh(RenderDevice* renderer);
+	virtual ~Mesh() = default;
 
 	// Create the model
 	void Create();

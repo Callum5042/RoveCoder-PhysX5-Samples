@@ -1,21 +1,20 @@
-#include "Model.h"
-#include "Renderer.h"
+#include "Mesh.h"
+#include "RenderDevice.h"
 #include "Vertex.h"
 #include <vector>
-#include <string>
-#include <filesystem>
+#include "DxCheck.h"
 
-Model::Model(Renderer* renderer) : m_Renderer(renderer)
+Mesh::Mesh(RenderDevice* renderer) : m_Renderer(renderer)
 {
 }
 
-void Model::Create()
+void Mesh::Create()
 {
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	this->CreateVertexBuffer();
+	this->CreateIndexBuffer();
 }
 
-void Model::CreateVertexBuffer()
+void Mesh::CreateVertexBuffer()
 {
 	ID3D11Device* device = m_Renderer->GetDevice();
 
@@ -69,7 +68,7 @@ void Model::CreateVertexBuffer()
 	DX::Check(device->CreateBuffer(&vertexbuffer_desc, &vertex_subdata, m_VertexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void Model::CreateIndexBuffer()
+void Mesh::CreateIndexBuffer()
 {
 	ID3D11Device* device = m_Renderer->GetDevice();
 
@@ -104,7 +103,7 @@ void Model::CreateIndexBuffer()
 	DX::Check(device->CreateBuffer(&index_buffer_desc, &index_subdata, m_IndexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void Model::Render()
+void Mesh::Render()
 {
 	ID3D11DeviceContext* context = m_Renderer->GetDeviceContext();
 

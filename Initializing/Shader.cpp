@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "Renderer.h"
+#include "RenderDevice.h"
 
 #include <Windows.h>
 #include "CompiledPixelShader.hlsl.h"
@@ -7,6 +7,8 @@
 
 #include <Windows.h>
 #include <DirectXMath.h>
+
+#include "DxCheck.h"
 
 namespace
 {
@@ -24,7 +26,7 @@ namespace
 	};
 }
 
-Shader::Shader(Renderer* renderer) : m_Renderer(renderer)
+Shader::Shader(RenderDevice* renderer) : m_Renderer(renderer)
 {
 }
 

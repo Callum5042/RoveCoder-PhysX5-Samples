@@ -1,11 +1,12 @@
 #include "Application.h"
 #include "Window.h"
 #include "Timer.h"
-#include "Renderer.h"
+#include "RenderDevice.h"
 #include "Shader.h"
-#include "Model.h"
+#include "Mesh.h"
 #include "Camera.h"
 #include "Physics.h"
+#include "RenderTarget.h"
 
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -22,8 +23,11 @@ Application::Application()
 	m_WindowCreated = m_Window->Create(m_ApplicationTitle, window_width, window_height, false);
 
 	// Create renderer
-	m_Renderer = std::make_unique<Renderer>(this);
+	m_Renderer = std::make_unique<RenderDevice>();
 	m_Renderer->Create();
+
+	m_RenderTarget = std::make_unique<RenderTarget>(m_Renderer.get(), m_Window.get());
+	m_RenderTarget->Create(window_width, window_height);
 
 	// Create shader
 	m_Shader = std::make_unique<Shader>(m_Renderer.get());
@@ -45,8 +49,8 @@ int Application::Execute()
 	timer.Start();
 
 	// Model
-	m_Model = std::make_unique<Model>(m_Renderer.get());
-	m_Model->Create();
+	m_Mesh = std::make_unique<Mesh>(m_Renderer.get());
+	m_Mesh->Create();
 
 	CreatePhysicsActor();
 
@@ -84,20 +88,20 @@ int Application::Execute()
 			m_Physics->Simulate(timer.DeltaTime());
 
 			// Clear the buffers
-			m_Renderer->Clear();
+			m_RenderTarget->Clear();
 
 			// Bind the shader to the pipeline
 			m_Shader->Use();
 
 			// Render the model
 			auto t = m_Body->getGlobalPose();
-			m_Model->World = DirectX::XMMatrixTranslation(t.p.x, t.p.y, t.p.z);
+			m_Mesh->World = DirectX::XMMatrixTranslation(t.p.x, t.p.y, t.p.z);
 
-			this->UpdateWorldConstantBuffer(m_Model->World);
-			m_Model->Render();
+			this->UpdateWorldConstantBuffer(m_Mesh->World);
+			m_Mesh->Render();
 
 			// Display the rendered scene
-			m_Renderer->Present();
+			m_RenderTarget->Present();
 		}
 	}
 
@@ -135,7 +139,7 @@ void Application::OnResized(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	int window_height = HIWORD(lParam);
 
 	// Resize renderer
-	m_Renderer->Resize(window_width, window_height);
+	m_RenderTarget->Resize(window_width, window_height);
 
 	// Update camera
 	m_Camera->UpdateAspectRatio(window_width, window_height);

@@ -1,66 +1,26 @@
-#include "Renderer.h"
-#include "Application.h"
+#include "RenderTarget.h"
+#include "RenderDevice.h"
+#include "DxCheck.h"
 #include "Window.h"
 
 #include <DirectXColors.h>
 
-Renderer::Renderer(Application* application) : m_Application(application)
+RenderTarget::RenderTarget(RenderDevice* renderer, Window* window) : m_RenderDevice(renderer), m_Window(window)
 {
 }
 
-void Renderer::Create()
+void RenderTarget::Create(int width, int height)
 {
-	int window_width, window_height;
-	m_Application->GetWindow()->GetSize(&window_width, &window_height);
-
-	// Setup Direct3D 11
-	CreateDeviceAndContext();
-	CreateSwapChain(window_width, window_height);
-	CreateRenderTargetAndDepthStencilView(window_width, window_height);
-	SetViewport(window_width, window_height);
+	this->CreateSwapChain(width, height);
+	this->CreateRenderTargetAndDepthStencilView(width, height);
+	this->SetViewport(width, height);
 }
 
-void Renderer::CreateDeviceAndContext()
-{
-	// Look for Direct3D 11 feature
-	D3D_FEATURE_LEVEL feature_levels[] =
-	{
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0
-	};
-
-	UINT feature_level_count = ARRAYSIZE(feature_levels);
-
-	// Add debug flag if in debug mode
-	D3D11_CREATE_DEVICE_FLAG deviceFlag = (D3D11_CREATE_DEVICE_FLAG)0;
-#ifdef _DEBUG
-	deviceFlag = D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	// Create device and device context
-	D3D_FEATURE_LEVEL feature_level;
-	DX::Check(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceFlag, feature_levels, feature_level_count,
-		D3D11_SDK_VERSION, m_Device.ReleaseAndGetAddressOf(), &feature_level, m_DeviceContext.ReleaseAndGetAddressOf()));
-
-	// Check if Direct3D 11.1 is supported, if not fall back to Direct3D 11
-	if (feature_level != D3D_FEATURE_LEVEL_11_1)
-	{
-		MessageBox(NULL, L"Unsupported", L"D3D_FEATURE_LEVEL_11_1 is not supported! Falling back to D3D_FEATURE_LEVEL_11_0", MB_OK);
-	}
-
-	// Check if Direct3D 11 is supported
-	if (feature_level != D3D_FEATURE_LEVEL_11_1)
-	{
-		MessageBox(NULL, L"Unsupported", L"D3D_FEATURE_LEVEL_11_0 is not supported", MB_OK);
-		throw std::exception();
-	}
-}
-
-void Renderer::CreateSwapChain(int width, int height)
+void RenderTarget::CreateSwapChain(int width, int height)
 {
 	// Query the device until we get the DXGIFactory
 	ComPtr<IDXGIDevice> dxgiDevice = nullptr;
-	DX::Check(m_Device.As(&dxgiDevice));
+	DX::Check(m_RenderDevice->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(dxgiDevice.GetAddressOf())));
 
 	ComPtr<IDXGIAdapter> adapter = nullptr;
 	DX::Check(dxgiDevice->GetAdapter(adapter.GetAddressOf()));
@@ -88,7 +48,7 @@ void Renderer::CreateSwapChain(int width, int height)
 		swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
 		// CreateSwapChainForHwnd is the prefered way of creating the swap chain
-		DX::Check(dxgiFactory2->CreateSwapChainForHwnd(m_Device.Get(), m_Application->GetWindow()->GetHwnd(), &swapchain_desc, nullptr, nullptr, &m_SwapChain1));
+		DX::Check(dxgiFactory2->CreateSwapChainForHwnd(m_RenderDevice->GetDevice(), m_Window->GetHwnd(), &swapchain_desc, nullptr, nullptr, &m_SwapChain1));
 		DX::Check(m_SwapChain1.As(&m_SwapChain));
 	}
 	else
@@ -107,20 +67,20 @@ void Renderer::CreateSwapChain(int width, int height)
 
 		swapchain_desc.BufferDesc.RefreshRate.Numerator = 60;
 		swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
-		swapchain_desc.OutputWindow = m_Application->GetWindow()->GetHwnd();
+		swapchain_desc.OutputWindow = m_Window->GetHwnd();
 		swapchain_desc.Windowed = TRUE;
 
 		// Creates the swapchain
-		DX::Check(dxgiFactory->CreateSwapChain(m_Device.Get(), &swapchain_desc, &m_SwapChain));
+		DX::Check(dxgiFactory->CreateSwapChain(m_RenderDevice->GetDevice(), &swapchain_desc, &m_SwapChain));
 	}
 }
 
-void Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
+void RenderTarget::CreateRenderTargetAndDepthStencilView(int width, int height)
 {
 	// Create the render target view
 	ComPtr<ID3D11Texture2D> back_buffer = nullptr;
 	DX::Check(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(back_buffer.GetAddressOf())));
-	DX::Check(m_Device->CreateRenderTargetView(back_buffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
+	DX::Check(m_RenderDevice->GetDevice()->CreateRenderTargetView(back_buffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
 
 	// Describe the depth stencil view
 	D3D11_TEXTURE2D_DESC depth_desc = {};
@@ -136,14 +96,14 @@ void Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
 
 	// Create the depth stencil view
 	ComPtr<ID3D11Texture2D> depth_stencil = nullptr;
-	DX::Check(m_Device->CreateTexture2D(&depth_desc, nullptr, &depth_stencil));
-	DX::Check(m_Device->CreateDepthStencilView(depth_stencil.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
+	DX::Check(m_RenderDevice->GetDevice()->CreateTexture2D(&depth_desc, nullptr, &depth_stencil));
+	DX::Check(m_RenderDevice->GetDevice()->CreateDepthStencilView(depth_stencil.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
 
 	// Binds both the render target and depth stencil to the pipeline's output merger stage
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	m_RenderDevice->GetDeviceContext()->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 }
 
-void Renderer::SetViewport(int width, int height)
+void RenderTarget::SetViewport(int width, int height)
 {
 	// Describe the viewport
 	D3D11_VIEWPORT viewport = {};
@@ -155,20 +115,20 @@ void Renderer::SetViewport(int width, int height)
 	viewport.TopLeftY = 0;
 
 	// Bind viewport to the pipline's rasterization stage
-	m_DeviceContext->RSSetViewports(1, &viewport);
+	m_RenderDevice->GetDeviceContext()->RSSetViewports(1, &viewport);
 }
 
-void Renderer::Clear()
+void RenderTarget::Clear()
 {
 	// Clear the render target view to the chosen colour
-	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
-	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_RenderDevice->GetDeviceContext()->ClearRenderTargetView(m_RenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
+	m_RenderDevice->GetDeviceContext()->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Bind the render target view to the pipeline's output merger stage
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	m_RenderDevice->GetDeviceContext()->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 }
 
-void Renderer::Present()
+void RenderTarget::Present()
 {
 	// Use IDXGISwapChain1::Present1 for presenting instead
 	// This is a requirement for using variable refresh rate displays
@@ -187,7 +147,7 @@ void Renderer::Present()
 	}
 }
 
-void Renderer::Resize(int width, int height)
+void RenderTarget::Resize(int width, int height)
 {
 	// Can only resize if width or height has a positive value to avoid crashing
 	if (width <= 0 || height <= 0)

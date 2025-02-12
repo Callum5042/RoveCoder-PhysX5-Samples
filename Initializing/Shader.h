@@ -7,14 +7,14 @@
 #include <wrl\client.h>
 using Microsoft::WRL::ComPtr;
 
-class Renderer;
+class RenderDevice;
 
 class Shader
 {
-	Renderer* m_Renderer = nullptr;
+	RenderDevice* m_Renderer = nullptr;
 
 public:
-	Shader(Renderer* renderer);
+	Shader(RenderDevice* renderer);
 	virtual ~Shader() = default;
 
 	// Load the shader

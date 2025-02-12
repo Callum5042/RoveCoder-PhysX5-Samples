@@ -13,11 +13,14 @@
 using namespace DirectX;
 
 class Window;
-class Renderer;
-class Shader;
-class Camera;
 
-class Model;
+class RenderDevice;
+class RenderTarget;
+class Shader;
+
+class Camera;
+class Mesh;
+
 class RasterState;
 class TextureSampler;
 class Physics;
@@ -37,9 +40,10 @@ public:
 
 private:
 	std::unique_ptr<Window> m_Window = nullptr;
-	std::unique_ptr<Renderer> m_Renderer = nullptr;
+	std::unique_ptr<RenderDevice> m_Renderer = nullptr;
+	std::unique_ptr<RenderTarget> m_RenderTarget = nullptr;
 	std::unique_ptr<Shader> m_Shader = nullptr;
-	std::unique_ptr<Model> m_Model = nullptr;
+	std::unique_ptr<Mesh> m_Mesh = nullptr;
 	std::unique_ptr<Camera> m_Camera = nullptr;
 	std::unique_ptr<Physics> m_Physics = nullptr;
 
