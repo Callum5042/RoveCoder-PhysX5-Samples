@@ -46,6 +46,5 @@ float4 main(PixelInput input) : SV_TARGET
     // Colour
     light_colour += input.colour;
     
-    
     return light_colour;
 }

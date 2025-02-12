@@ -23,8 +23,9 @@ class Mesh;
 
 class RasterState;
 class TextureSampler;
-class Physics;
 
+class Physics;
+class Scene;
 class LineManager;
 
 class Application
@@ -48,6 +49,7 @@ private:
 	std::unique_ptr<Mesh> m_Mesh = nullptr;
 	std::unique_ptr<Camera> m_Camera = nullptr;
 	std::unique_ptr<Physics> m_Physics = nullptr;
+	std::unique_ptr<Scene> m_Scene = nullptr;
 
 	std::unique_ptr<LineManager> m_LineManager = nullptr;
 
@@ -68,7 +70,7 @@ private:
 	// Compute model view projection of the camera
 	void UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world);
 
-	// Physics bullshit
+	// Physics
 	physx::PxRigidBody* m_Body = nullptr;
 	void CreatePhysicsActor();
 

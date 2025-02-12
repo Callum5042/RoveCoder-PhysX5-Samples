@@ -1,6 +1,7 @@
 #include "LineManager.h"
 #include "RenderDevice.h"
 #include "Physics.h"
+#include "Scene.h"
 #include "DxCheck.h"
 
 LineManager::LineManager(RenderDevice* renderer) : m_Renderer(renderer)
@@ -29,10 +30,10 @@ void LineManager::AddLine(LineVertex a, LineVertex b)
     m_LineList.push_back(b);
 }
 
-void LineManager::AddSceneLine(Physics* physics)
+void LineManager::AddSceneLine(Scene* scene)
 {
     std::vector<LineVertex> vertices;
-    const physx::PxRenderBuffer& rb = physics->GetScene()->getRenderBuffer();
+    const physx::PxRenderBuffer& rb = scene->GetScene()->getRenderBuffer();
     for (physx::PxU32 i = 0; i < rb.getNbLines(); i++)
     {
         const physx::PxDebugLine& line = rb.getLines()[i];

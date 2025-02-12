@@ -9,18 +9,7 @@ Physics::~Physics()
 
 void Physics::Setup()
 {
-    CreateFoundationAndPhysics();
-    CreateScene();
-
-    m_Scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
-    m_Scene->setVisualizationParameter(physx::PxVisualizationParameter::eACTOR_AXES, 2.0f);
-    m_Scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
-}
-
-void Physics::Simulate(double delta_time)
-{
-    m_Scene->simulate(static_cast<physx::PxReal>(delta_time));
-    m_Scene->fetchResults(true);
+    this->CreateFoundationAndPhysics();
 }
 
 void Physics::CreateFoundationAndPhysics()
@@ -43,18 +32,4 @@ void Physics::CreateFoundationAndPhysics()
     {
         throw std::exception("PxCreatePhysics failed!");
     }
-}
-
-void Physics::CreateScene()
-{
-    // Create CPU dispatcher
-    physx::PxDefaultCpuDispatcher* dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-
-    // Create scene
-    physx::PxSceneDesc scene_desc(m_Physics->getTolerancesScale());
-    scene_desc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-    scene_desc.cpuDispatcher = dispatcher;
-    scene_desc.filterShader = physx::PxDefaultSimulationFilterShader;
-
-    m_Scene = m_Physics->createScene(scene_desc);
 }

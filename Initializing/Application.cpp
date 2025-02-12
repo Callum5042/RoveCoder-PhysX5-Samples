@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "Physics.h"
+#include "Scene.h"
 #include "RenderTarget.h"
 #include "LineManager.h"
 
@@ -43,6 +44,9 @@ Application::Application()
 	m_Physics = std::make_unique<Physics>();
 	m_Physics->Setup();
 
+	m_Scene = std::make_unique<Scene>(m_Physics.get());
+	m_Scene->Setup();
+
 	m_LineManager = std::make_unique<LineManager>(m_Renderer.get());
 	m_LineManager->Create();
 }
@@ -68,7 +72,7 @@ int Application::Execute()
 		shape->release(); // this way shape gets automatically released with actor
 	}
 
-	m_Physics->GetScene()->addActor(*rigidStatic);
+	m_Scene->GetScene()->addActor(*rigidStatic);
 
 	// Main application loop
 	while (m_Running)
@@ -89,7 +93,7 @@ int Application::Execute()
 		}
 		else
 		{
-			m_Physics->Simulate(timer.DeltaTime());
+			m_Scene->Simulate(timer.DeltaTime());
 
 			// Clear the buffers
 			m_RenderTarget->Clear();
@@ -106,7 +110,7 @@ int Application::Execute()
 
 			// Lines
 			m_LineManager->ClearLines();
-			m_LineManager->AddSceneLine(m_Physics.get());
+			m_LineManager->AddSceneLine(m_Scene.get());
 			this->UpdateWorldConstantBuffer(DirectX::XMMatrixIdentity());
 			m_LineManager->Render();
 
@@ -222,5 +226,5 @@ void Application::CreatePhysicsActor()
 	m_Body = m_Physics->GetPhysics()->createRigidDynamic(transform);
 	m_Body->attachShape(*shape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*m_Body, 100.0f);
-	m_Physics->GetScene()->addActor(*m_Body);
+	m_Scene->GetScene()->addActor(*m_Body);
 }

@@ -9,6 +9,7 @@ using Microsoft::WRL::ComPtr;
 
 class RenderDevice;
 class Physics;
+class Scene;
 
 struct LineVertex
 {
@@ -44,7 +45,7 @@ public:
 	void AddLine(LineVertex a, LineVertex b);
 
 	// Add lines from scene
-	void AddSceneLine(Physics* physics);
+	void AddSceneLine(Scene* scene);
 
 	// Render lines
 	void Render();

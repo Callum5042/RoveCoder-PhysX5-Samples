@@ -20,10 +20,7 @@ public:
 	virtual ~Physics();
 
 	void Setup();
-	void Simulate(double delta_time);
-
 	inline physx::PxPhysics* GetPhysics() { return m_Physics; }
-	inline physx::PxScene* GetScene() { return m_Scene; }
 
 private:
 	// Setup
@@ -35,8 +32,4 @@ private:
 	UserErrorCallback m_DefaultErrorCallback;
 	physx::PxDefaultAllocator m_DefaultAllocatorCallback;
 	void CreateFoundationAndPhysics();
-
-	// Scene
-	physx::PxScene* m_Scene = nullptr;
-	void CreateScene();
 };
