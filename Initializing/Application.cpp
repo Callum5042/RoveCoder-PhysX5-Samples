@@ -10,6 +10,8 @@
 #include "RenderTarget.h"
 #include "LineManager.h"
 
+#include "StaticFloorActor.h"
+
 #include <DirectXMath.h>
 using namespace DirectX;
 
@@ -62,17 +64,8 @@ int Application::Execute()
 
 	CreatePhysicsActor();
 
-	physx::PxShapeFlags shapeFlags = physx::PxShapeFlag::eVISUALIZATION | physx::PxShapeFlag::eSCENE_QUERY_SHAPE | physx::PxShapeFlag::eSIMULATION_SHAPE;
-	physx::PxMaterial* materialPtr = m_Physics->GetPhysics()->createMaterial(0.4f, 0.4f, 0.4f);
-
-	physx::PxRigidStatic* rigidStatic = m_Physics->GetPhysics()->createRigidStatic(physx::PxTransformFromPlaneEquation(physx::PxPlane(physx::PxVec3(0.f, 1.f, 0.f), 1.f)));
-	{
-		physx::PxShape* shape = m_Physics->GetPhysics()->createShape(physx::PxPlaneGeometry(), &materialPtr, 1, true, shapeFlags);
-		rigidStatic->attachShape(*shape);
-		shape->release(); // this way shape gets automatically released with actor
-	}
-
-	m_Scene->GetScene()->addActor(*rigidStatic);
+	std::unique_ptr<StaticFloorActor> m_FloorActor = std::make_unique<StaticFloorActor>(m_Physics.get(), m_Scene.get());
+	m_FloorActor->Create();
 
 	// Main application loop
 	while (m_Running)
