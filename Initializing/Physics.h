@@ -1,17 +1,6 @@
 #pragma once
 
-#include <iostream>
 #include "PxPhysicsAPI.h"
-
-class UserErrorCallback : public physx::PxDefaultErrorCallback
-{
-public:
-	virtual void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
-	{
-		physx::PxDefaultErrorCallback::reportError(code, message, file, line);
-		std::cerr << "Error: " << code << " - " << message << '\n';
-	}
-};
 
 class Physics
 {
@@ -29,7 +18,7 @@ private:
 	physx::PxPvdTransport* m_Transport = nullptr;
 	physx::PxFoundation* m_Foundation = nullptr;
 
-	UserErrorCallback m_DefaultErrorCallback;
+	physx::PxDefaultErrorCallback m_DefaultErrorCallback;
 	physx::PxDefaultAllocator m_DefaultAllocatorCallback;
 	void CreateFoundationAndPhysics();
 };
