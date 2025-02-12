@@ -11,6 +11,7 @@
 #include "LineManager.h"
 
 #include "StaticFloorActor.h"
+#include "DynamicActor.h"
 
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -27,14 +28,14 @@ Application::Application()
 	m_WindowCreated = m_Window->Create(m_ApplicationTitle, window_width, window_height, false);
 
 	// Create renderer
-	m_Renderer = std::make_unique<RenderDevice>();
-	m_Renderer->Create();
+	m_RenderDevice = std::make_unique<RenderDevice>();
+	m_RenderDevice->Create();
 
-	m_RenderTarget = std::make_unique<RenderTarget>(m_Renderer.get(), m_Window.get());
+	m_RenderTarget = std::make_unique<RenderTarget>(m_RenderDevice.get(), m_Window.get());
 	m_RenderTarget->Create(window_width, window_height);
 
 	// Create shader
-	m_Shader = std::make_unique<Shader>(m_Renderer.get());
+	m_Shader = std::make_unique<Shader>(m_RenderDevice.get());
 	m_Shader->Load();
 
 	m_Shader->UpdateDirectionalLightBuffer(DirectX::XMFLOAT4(0.7f, -0.6f, 0.4f, 1.0f));
@@ -49,7 +50,7 @@ Application::Application()
 	m_Scene = std::make_unique<Scene>(m_Physics.get());
 	m_Scene->Setup();
 
-	m_LineManager = std::make_unique<LineManager>(m_Renderer.get());
+	m_LineManager = std::make_unique<LineManager>(m_RenderDevice.get());
 	m_LineManager->Create();
 }
 
@@ -59,13 +60,15 @@ int Application::Execute()
 	timer.Start();
 
 	// Model
-	m_Mesh = std::make_unique<Mesh>(m_Renderer.get());
+	m_Mesh = std::make_unique<Mesh>(m_RenderDevice.get());
 	m_Mesh->Create();
 
-	CreatePhysicsActor();
-
+	// Physics
 	std::unique_ptr<StaticFloorActor> m_FloorActor = std::make_unique<StaticFloorActor>(m_Physics.get(), m_Scene.get());
 	m_FloorActor->Create();
+
+	std::unique_ptr<DynamicActor> m_DynamicActor = std::make_unique<DynamicActor>(m_Physics.get(), m_Scene.get());
+	m_DynamicActor->Create();
 
 	// Main application loop
 	while (m_Running)
@@ -95,10 +98,7 @@ int Application::Execute()
 			m_Shader->Use();
 
 			// Render the model
-			auto t = m_Body->getGlobalPose();
-			m_Mesh->World = DirectX::XMMatrixTranslation(t.p.x, t.p.y, t.p.z);
-
-			this->UpdateWorldConstantBuffer(m_Mesh->World);
+			this->UpdateWorldConstantBuffer(m_DynamicActor->Transform());
 			m_Mesh->Render();
 
 			// Lines
@@ -205,19 +205,4 @@ void Application::UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world)
 	DirectX::XMFLOAT3 position = m_Camera->GetPosition();
 	DirectX::XMMATRIX inverse_model = DirectX::XMMatrixInverse(nullptr, world);
 	m_Shader->UpdateModelViewProjectionBuffer(matrix, inverse_model, position);
-}
-
-void Application::CreatePhysicsActor()
-{
-	physx::PxMaterial* material = m_Physics->GetPhysics()->createMaterial(0.4f, 0.4f, 0.4f);
-	physx::PxShape* shape = m_Physics->GetPhysics()->createShape(physx::PxBoxGeometry(1.0f, 1.0f, 1.0f), *material);
-
-	// Set position
-	physx::PxVec3 position = physx::PxVec3(physx::PxReal(0.0f), physx::PxReal(2.0f), physx::PxReal(0.0f));
-	physx::PxTransform transform(position);
-
-	m_Body = m_Physics->GetPhysics()->createRigidDynamic(transform);
-	m_Body->attachShape(*shape);
-	physx::PxRigidBodyExt::updateMassAndInertia(*m_Body, 100.0f);
-	m_Scene->GetScene()->addActor(*m_Body);
 }

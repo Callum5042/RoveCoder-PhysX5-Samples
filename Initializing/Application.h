@@ -43,7 +43,7 @@ public:
 
 private:
 	std::unique_ptr<Window> m_Window = nullptr;
-	std::unique_ptr<RenderDevice> m_Renderer = nullptr;
+	std::unique_ptr<RenderDevice> m_RenderDevice = nullptr;
 	std::unique_ptr<RenderTarget> m_RenderTarget = nullptr;
 	std::unique_ptr<Shader> m_Shader = nullptr;
 	std::unique_ptr<Mesh> m_Mesh = nullptr;
@@ -69,10 +69,4 @@ private:
 
 	// Compute model view projection of the camera
 	void UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world);
-
-	// Physics
-	physx::PxRigidBody* m_Body = nullptr;
-	void CreatePhysicsActor();
-
-	physx::PxRigidBody* m_Floor = nullptr;
 };

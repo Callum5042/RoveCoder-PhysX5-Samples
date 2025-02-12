@@ -24,9 +24,6 @@ public:
 	// Render the model
 	void Render();
 
-	// Position
-	DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
-
 private:
 	// Number of indices to draw
 	UINT m_IndexCount = 0;
