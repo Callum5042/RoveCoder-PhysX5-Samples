@@ -14,5 +14,8 @@ PixelInput main(VertexInput input)
     // Transform the normals by the inverse world space
     pixel_input.normal = mul(input.normal, (float3x3) cModelInverse).xyz;
 
+    // Pass the colour
+    pixel_input.colour = input.colour;
+    
     return pixel_input;
 }

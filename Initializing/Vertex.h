@@ -22,4 +22,10 @@ struct Vertex
 {
 	VertexPosition position;
 	VertexNormal normal;
+
+	// Colour
+	float r = 0;
+	float g = 0;
+	float b = 0;
+	float a = 0;
 };

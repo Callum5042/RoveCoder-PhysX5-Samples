@@ -25,6 +25,8 @@ class RasterState;
 class TextureSampler;
 class Physics;
 
+class LineManager;
+
 class Application
 {
 public:
@@ -46,6 +48,8 @@ private:
 	std::unique_ptr<Mesh> m_Mesh = nullptr;
 	std::unique_ptr<Camera> m_Camera = nullptr;
 	std::unique_ptr<Physics> m_Physics = nullptr;
+
+	std::unique_ptr<LineManager> m_LineManager = nullptr;
 
 	bool m_Running = true;
 	bool m_WindowCreated = false;

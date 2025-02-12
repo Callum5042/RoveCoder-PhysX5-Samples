@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Physics.h"
 #include "RenderTarget.h"
+#include "LineManager.h"
 
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -41,6 +42,9 @@ Application::Application()
 	// Physics
 	m_Physics = std::make_unique<Physics>();
 	m_Physics->Setup();
+
+	m_LineManager = std::make_unique<LineManager>(m_Renderer.get());
+	m_LineManager->Create();
 }
 
 int Application::Execute()
@@ -99,6 +103,12 @@ int Application::Execute()
 
 			this->UpdateWorldConstantBuffer(m_Mesh->World);
 			m_Mesh->Render();
+
+			// Lines
+			m_LineManager->ClearLines();
+			m_LineManager->AddSceneLine(m_Physics.get());
+			this->UpdateWorldConstantBuffer(DirectX::XMMatrixIdentity());
+			m_LineManager->Render();
 
 			// Display the rendered scene
 			m_RenderTarget->Present();

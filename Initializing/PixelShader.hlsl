@@ -41,8 +41,11 @@ float4 main(PixelInput input) : SV_TARGET
 
 	// Calculate directional light
     float4 light_colour = CalculateDirectionalLighting(input.position.xyz, input.normal);
-
     light_colour = pow(light_colour, 1.0f / 2.2f);
+    
+    // Colour
+    light_colour += input.colour;
+    
     
     return light_colour;
 }
