@@ -14,4 +14,4 @@ Download Visual Studio 2022 Community Edition for free [here](https://visualstud
 
 ### PhysX Compiling
 
-PhysX source code can be found on GitHub here: https://github.com/NVIDIA-Omniverse/PhysX. The binaries may have to be compiled separetely and then copied into the folder for use by the samples `D:\Sources\RoveCoder-PhysX5-Samples\External\PhysX\lib`.
+PhysX source code can be found on GitHub here: https://github.com/NVIDIA-Omniverse/PhysX. The binaries may have to be compiled separetely and then copied into the folder for use by the samples `.\External\PhysX\lib`.
