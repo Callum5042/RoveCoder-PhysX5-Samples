@@ -2,6 +2,7 @@
 
 struct VertexPosition
 {
+	VertexPosition() = default;
 	VertexPosition(float x, float y, float z) : x(x), y(y), z(z) {}
 
 	float x = 0;
@@ -11,6 +12,7 @@ struct VertexPosition
 
 struct VertexNormal
 {
+	VertexNormal() = default;
 	VertexNormal(float nx, float ny, float nz) : normal_x(nx), normal_y(ny), normal_z(nz) {}
 
 	float normal_x = 0;

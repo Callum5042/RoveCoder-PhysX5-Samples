@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Vertex.h"
+
+#include <vector>
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -19,13 +23,15 @@ public:
 	virtual ~Mesh() = default;
 
 	// Create the model
-	void Create();
+	void CreateCube(float width, float height, float depth);
 
 	// Render the model
 	void Render();
 
 private:
 	// Number of indices to draw
+	std::vector<Vertex> m_Vertices;
+	std::vector<UINT> m_Indices;
 	UINT m_IndexCount = 0;
 
 	// Vertex buffer

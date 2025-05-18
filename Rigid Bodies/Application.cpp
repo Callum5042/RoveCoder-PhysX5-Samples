@@ -61,7 +61,7 @@ int Application::Execute()
 
 	// Model
 	m_Mesh = std::make_unique<Mesh>(m_RenderDevice.get());
-	m_Mesh->Create();
+	m_Mesh->CreateCube(1.0f, 1.0f, 1.0f);
 
 	// Physics
 	std::unique_ptr<StaticFloorActor> m_FloorActor = std::make_unique<StaticFloorActor>(m_Physics.get(), m_Scene.get());
