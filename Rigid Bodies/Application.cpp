@@ -61,13 +61,14 @@ int Application::Execute()
 
 	// Model
 	m_Mesh = std::make_unique<Mesh>(m_RenderDevice.get());
-	m_Mesh->CreateCube(1.0f, 1.0f, 1.0f);
+	// m_Mesh->CreateCube(1.0f, 1.0f, 1.0f);
+	m_Mesh->CreateSphere(1.0f, 16, 8);
 
 	// Physics
 	std::unique_ptr<StaticFloorActor> m_FloorActor = std::make_unique<StaticFloorActor>(m_Physics.get(), m_Scene.get());
 	m_FloorActor->Create();
-
-	std::unique_ptr<DynamicActor> m_DynamicActor = std::make_unique<DynamicActor>(m_Physics.get(), m_Scene.get());
+	 
+	m_DynamicActor = std::make_unique<DynamicActor>(m_Physics.get(), m_Scene.get());
 	m_DynamicActor->Create();
 
 	// Main application loop
@@ -89,6 +90,8 @@ int Application::Execute()
 		}
 		else
 		{
+			HandleMovements();
+
 			m_Scene->Simulate(timer.DeltaTime());
 
 			// Clear the buffers
@@ -205,4 +208,26 @@ void Application::UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world)
 	DirectX::XMFLOAT3 position = m_Camera->GetPosition();
 	DirectX::XMMATRIX inverse_model = DirectX::XMMatrixInverse(nullptr, world);
 	m_Shader->UpdateModelViewProjectionBuffer(matrix, inverse_model, position);
+}
+
+void Application::HandleMovements()
+{
+	// Movement
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
+		m_DynamicActor->AddForce(0.0f, 0.0f, 1.0f);
+	}
+	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		m_DynamicActor->AddForce(0.0f, 0.0f, -1.0f);
+	}
+
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		m_DynamicActor->AddForce(1.0f, 0.0f, 0.0f);
+	}
+	else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		m_DynamicActor->AddForce(-1.0f, 0.0f, 0.0f);
+	}
 }

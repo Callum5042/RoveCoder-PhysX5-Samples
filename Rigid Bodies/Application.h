@@ -28,6 +28,8 @@ class Physics;
 class Scene;
 class LineManager;
 
+class DynamicActor;
+
 class Application
 {
 public:
@@ -69,4 +71,10 @@ private:
 
 	// Compute model view projection of the camera
 	void UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world);
+
+	// Movements
+	void HandleMovements();
+
+	// Actors
+	std::unique_ptr<DynamicActor> m_DynamicActor;
 };

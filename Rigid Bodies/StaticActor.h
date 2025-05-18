@@ -7,20 +7,18 @@ using namespace DirectX;
 class Physics;
 class Scene;
 
-class DynamicActor
+class StaticActor
 {
 	Physics* m_Physics = nullptr;
 	Scene* m_Scene = nullptr;
 
 public:
-	DynamicActor(Physics* physics, Scene* scene);
-	virtual ~DynamicActor();
+	StaticActor(Physics* physics, Scene* scene);
+	virtual ~StaticActor();
 
 	void Create();
 
 	DirectX::XMMATRIX Transform();
-
-	void AddForce(float x, float y, float z);
 
 private:
 	physx::PxRigidDynamic* m_Actor = nullptr;

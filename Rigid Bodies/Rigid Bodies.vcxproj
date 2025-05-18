@@ -166,6 +166,7 @@
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="StaticActor.cpp" />
     <ClCompile Include="StaticFloorActor.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="StaticActor.h" />
     <ClInclude Include="StaticFloorActor.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vertex.h" />

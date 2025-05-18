@@ -1,18 +1,18 @@
-#include "DynamicActor.h"
+#include "StaticActor.h"
 #include "Physics.h"
 #include "Scene.h"
 
-DynamicActor::DynamicActor(Physics* physics, Scene* scene) : m_Physics(physics), m_Scene(scene)
+StaticActor::StaticActor(Physics* physics, Scene* scene) : m_Physics(physics), m_Scene(scene)
 {
 }
 
-DynamicActor::~DynamicActor()
+StaticActor::~StaticActor()
 {
 	if (m_Actor != nullptr) 
 		m_Actor->release();
 }
 
-void DynamicActor::Create()
+void StaticActor::Create()
 {
 	physx::PxPhysics* physics = m_Physics->GetPhysics();
 
@@ -24,19 +24,14 @@ void DynamicActor::Create()
 
 	// Add shape to actor
 	physx::PxMaterial* material = physics->createMaterial(0.4f, 0.4f, 0.4f);
-	physx::PxShape* shape = physics->createShape(physx::PxSphereGeometry(1.0f), *material);
+	physx::PxShape* shape = physics->createShape(physx::PxBoxGeometry(1.0f, 1.0f, 1.0f), *material);
 	m_Actor->attachShape(*shape);
 
 	// Add actor to the scene
 	m_Scene->GetScene()->addActor(*m_Actor);
 }
 
-void DynamicActor::AddForce(float x, float y, float z)
-{
-	m_Actor->addForce(physx::PxVec3(x, y, z));
-}
-
-DirectX::XMMATRIX DynamicActor::Transform()
+DirectX::XMMATRIX StaticActor::Transform()
 {
 	auto t = m_Actor->getGlobalPose();
 

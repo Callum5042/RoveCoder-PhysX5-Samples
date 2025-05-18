@@ -72,6 +72,80 @@ void Mesh::CreateCube(float width, float height, float depth)
 	this->CreateIndexBuffer();
 }
 
+void Mesh::CreateSphere(float radius, int sliceCount, int stackCount)
+{
+	m_Vertices.clear();
+	m_Indices.clear();
+
+	// Top vertex (north pole)
+	m_Vertices.push_back({ VertexPosition(0.0f, +radius, 0.0f), VertexNormal(0.0f, +1.0f, 0.0f) });
+
+	for (int i = 1; i <= stackCount - 1; ++i)
+	{
+		float phi = XM_PI * i / stackCount; // latitude
+
+		for (int j = 0; j <= sliceCount; ++j)
+		{
+			float theta = 2.0f * XM_PI * j / sliceCount; // longitude
+
+			float x = radius * sinf(phi) * cosf(theta);
+			float y = radius * cosf(phi);
+			float z = radius * sinf(phi) * sinf(theta);
+
+			XMFLOAT3 position = XMFLOAT3(x, y, z);
+			XMFLOAT3 normal = XMFLOAT3(x / radius, y / radius, z / radius); // normalized
+
+			m_Vertices.push_back(Vertex { VertexPosition(position.x, position.y, position.z), VertexNormal(normal.x, normal.y, normal.z) });
+		}
+	}
+
+	// Bottom vertex (south pole)
+	m_Vertices.push_back({ VertexPosition(0.0f, -radius, 0.0f), VertexNormal(0.0f, -1.0f, 0.0f) });
+
+	// Indices for top stack
+	for (int i = 1; i <= sliceCount; ++i)
+	{
+		m_Indices.push_back(0);
+		m_Indices.push_back(i + 1);
+		m_Indices.push_back(i);
+	}
+
+	// Indices for inner stacks
+	int baseIndex = 1;
+	int ringVertexCount = sliceCount + 1;
+	for (int i = 0; i < stackCount - 2; ++i)
+	{
+		for (int j = 0; j < sliceCount; ++j)
+		{
+			m_Indices.push_back(baseIndex + i * ringVertexCount + j);
+			m_Indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_Indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+			m_Indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			m_Indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_Indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+		}
+	}
+
+	// Indices for bottom stack
+	UINT southPoleIndex = static_cast<UINT>(m_Vertices.size() - 1);
+	baseIndex = southPoleIndex - ringVertexCount;
+
+	for (int i = 0; i < sliceCount; ++i)
+	{
+		m_Indices.push_back(southPoleIndex);
+		m_Indices.push_back(baseIndex + i);
+		m_Indices.push_back(baseIndex + i + 1);
+	}
+
+	m_IndexCount = static_cast<UINT>(m_Indices.size());
+
+	// Create GPU buffers
+	this->CreateVertexBuffer();
+	this->CreateIndexBuffer();
+}
+
+
 void Mesh::CreateVertexBuffer()
 {
 	ID3D11Device* device = m_Renderer->GetDevice();

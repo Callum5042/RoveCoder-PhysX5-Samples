@@ -24,6 +24,7 @@ public:
 
 	// Create the model
 	void CreateCube(float width, float height, float depth);
+	void CreateSphere(float radius, int slice_count, int stack_count);
 
 	// Render the model
 	void Render();
