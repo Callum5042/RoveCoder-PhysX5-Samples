@@ -21,5 +21,5 @@ public:
 	DirectX::XMMATRIX Transform();
 
 private:
-	physx::PxRigidDynamic* m_Actor = nullptr;
+	physx::PxRigidStatic* m_Actor = nullptr;
 };

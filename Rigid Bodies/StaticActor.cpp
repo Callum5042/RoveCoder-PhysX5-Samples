@@ -17,10 +17,9 @@ void StaticActor::Create()
 	physx::PxPhysics* physics = m_Physics->GetPhysics();
 
 	// Create actor at position
-	physx::PxVec3 position = physx::PxVec3(physx::PxReal(0.0f), physx::PxReal(2.0f), physx::PxReal(0.0f));
+	physx::PxVec3 position = physx::PxVec3(physx::PxReal(0.0f), physx::PxReal(0.0f), physx::PxReal(5.0f));
 	physx::PxTransform transform(position);
-	m_Actor = physics->createRigidDynamic(transform);
-	physx::PxRigidBodyExt::updateMassAndInertia(*m_Actor, 100.0f);
+	m_Actor = physics->createRigidStatic(transform);
 
 	// Add shape to actor
 	physx::PxMaterial* material = physics->createMaterial(0.4f, 0.4f, 0.4f);

@@ -29,6 +29,7 @@ class Scene;
 class LineManager;
 
 class DynamicActor;
+class StaticActor;
 
 class Application
 {
@@ -48,7 +49,8 @@ private:
 	std::unique_ptr<RenderDevice> m_RenderDevice = nullptr;
 	std::unique_ptr<RenderTarget> m_RenderTarget = nullptr;
 	std::unique_ptr<Shader> m_Shader = nullptr;
-	std::unique_ptr<Mesh> m_Mesh = nullptr;
+	std::unique_ptr<Mesh> m_SphereMesh = nullptr;
+	std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 	std::unique_ptr<Camera> m_Camera = nullptr;
 	std::unique_ptr<Physics> m_Physics = nullptr;
 	std::unique_ptr<Scene> m_Scene = nullptr;
@@ -77,4 +79,5 @@ private:
 
 	// Actors
 	std::unique_ptr<DynamicActor> m_DynamicActor;
+	std::unique_ptr<StaticActor> m_StaticActor;
 };

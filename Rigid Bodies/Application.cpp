@@ -12,6 +12,7 @@
 
 #include "StaticFloorActor.h"
 #include "DynamicActor.h"
+#include "StaticActor.h"
 
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -60,16 +61,22 @@ int Application::Execute()
 	timer.Start();
 
 	// Model
-	m_Mesh = std::make_unique<Mesh>(m_RenderDevice.get());
-	// m_Mesh->CreateCube(1.0f, 1.0f, 1.0f);
-	m_Mesh->CreateSphere(1.0f, 16, 8);
+	m_SphereMesh = std::make_unique<Mesh>(m_RenderDevice.get());
+	m_SphereMesh->CreateSphere(1.0f, 16, 8);
+
+	m_DynamicActor = std::make_unique<DynamicActor>(m_Physics.get(), m_Scene.get());
+	m_DynamicActor->Create();
+
+	// Model
+	m_CubeMesh = std::make_unique<Mesh>(m_RenderDevice.get());
+	m_CubeMesh->CreateCube(1.0f, 1.0f, 1.0f);
+
+	m_StaticActor = std::make_unique<StaticActor>(m_Physics.get(), m_Scene.get());
+	m_StaticActor->Create();
 
 	// Physics
 	std::unique_ptr<StaticFloorActor> m_FloorActor = std::make_unique<StaticFloorActor>(m_Physics.get(), m_Scene.get());
 	m_FloorActor->Create();
-	 
-	m_DynamicActor = std::make_unique<DynamicActor>(m_Physics.get(), m_Scene.get());
-	m_DynamicActor->Create();
 
 	// Main application loop
 	while (m_Running)
@@ -102,7 +109,11 @@ int Application::Execute()
 
 			// Render the model
 			this->UpdateWorldConstantBuffer(m_DynamicActor->Transform());
-			m_Mesh->Render();
+			m_SphereMesh->Render();
+
+			// Render the model
+			this->UpdateWorldConstantBuffer(m_StaticActor->Transform());
+			m_CubeMesh->Render();
 
 			// Lines
 			m_LineManager->ClearLines();
