@@ -17,7 +17,7 @@ void StaticActor::Create()
 	physx::PxPhysics* physics = m_Physics->GetPhysics();
 
 	// Create actor at position
-	physx::PxVec3 position = physx::PxVec3(physx::PxReal(0.0f), physx::PxReal(0.0f), physx::PxReal(5.0f));
+	physx::PxVec3 position = physx::PxVec3(0.0f, 0.0f, 5.0f);
 	physx::PxTransform transform(position);
 	m_Actor = physics->createRigidStatic(transform);
 
@@ -25,6 +25,7 @@ void StaticActor::Create()
 	physx::PxMaterial* material = physics->createMaterial(0.4f, 0.4f, 0.4f);
 	physx::PxShape* shape = physics->createShape(physx::PxBoxGeometry(1.0f, 1.0f, 1.0f), *material);
 	m_Actor->attachShape(*shape);
+	shape->release();
 
 	// Add actor to the scene
 	m_Scene->GetScene()->addActor(*m_Actor);
