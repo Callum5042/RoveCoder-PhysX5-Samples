@@ -224,21 +224,23 @@ void Application::UpdateWorldConstantBuffer(const DirectX::XMMATRIX& world)
 void Application::HandleMovements()
 {
 	// Movement
+	const float speed = 10.0f;
+
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
-		m_DynamicActor->AddForce(0.0f, 0.0f, 1.0f);
+		m_DynamicActor->AddForce(0.0f, 0.0f, speed);
 	}
 	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 	{
-		m_DynamicActor->AddForce(0.0f, 0.0f, -1.0f);
+		m_DynamicActor->AddForce(0.0f, 0.0f, -speed);
 	}
 
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
-		m_DynamicActor->AddForce(1.0f, 0.0f, 0.0f);
+		m_DynamicActor->AddForce(speed, 0.0f, 0.0f);
 	}
 	else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
-		m_DynamicActor->AddForce(-1.0f, 0.0f, 0.0f);
+		m_DynamicActor->AddForce(-speed, 0.0f, 0.0f);
 	}
 }

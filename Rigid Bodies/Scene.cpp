@@ -1,5 +1,20 @@
 #include "Scene.h"
 #include "Physics.h"
+#include <iostream>
+
+namespace
+{
+	PxFilterFlags DefaultFilterShaderCallback(
+		PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+		PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+		PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+	{
+		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+
+		return PxFilterFlag::eDEFAULT;
+	}
+}
 
 Scene::Scene(Physics* physics) : m_Physics(physics)
 {
@@ -30,7 +45,8 @@ void Scene::CreateScene()
 	physx::PxSceneDesc scene_desc(m_Physics->GetPhysics()->getTolerancesScale());
 	scene_desc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	scene_desc.cpuDispatcher = dispatcher;
-	scene_desc.filterShader = physx::PxDefaultSimulationFilterShader;
+	scene_desc.filterShader = DefaultFilterShaderCallback;
+	scene_desc.simulationEventCallback = &m_FilterCallback;
 
 	m_Scene = m_Physics->GetPhysics()->createScene(scene_desc);
 }
